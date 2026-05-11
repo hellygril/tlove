@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>爱心</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: #ffffff;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.center-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  animation: beat 1.1s infinite ease-in-out;
+  cursor: pointer;
+}
+
+.heart {
+  width: 120px;
+  height: 120px;
+  background: #ff4d7a;
+  position: relative;
+  transform: rotate(45deg);
+}
+.heart::before,
+.heart::after {
+  content: '';
+  width: 120px;
+  height: 120px;
+  background: inherit;
+  border-radius: 50%;
+  position: absolute;
+}
+.heart::before { left: -60px; top: 0; }
+.heart::after { left: 0; top: -60px; }
+
+.text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  white-space: nowrap;
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+}
+.text.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* 飘落爱心 */
+.fall {
+  position: fixed;
+  pointer-events: none;
+  animation: fallDown linear forwards;
+}
+.fall::after {
+  content: '❤️';
+  font-size: inherit;
+}
+
+/* 点击爆炸爱心 */
+.burst {
+  position: fixed;
+  pointer-events: none;
+  animation: burstAni 0.9s ease-out forwards;
+}
+.burst::after {
+  content: '❤️';
+  font-size: inherit;
+}
+
+@keyframes beat {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes fallDown {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(360deg); opacity: 0.6; }
+}
+@keyframes burstAni {
+  0% { transform: scale(1) translate(0,0); opacity: 1; }
+  100% { transform: scale(0.4) translate(var(--x), var(--y)); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="center-box" id="box">
+  <div class="heart"></div>
+  <div class="text" id="text">我爱你</div>
+</div>
+
+<script>
+function r(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+// 自动飘爱心
+function makeFall() {
+  let f = document.createElement('div');
+  f.className = 'fall';
+  f.style.fontSize = r(12, 22) + 'px';
+  f.style.left = r(0, window.innerWidth) + 'px';
+  f.style.animationDuration = r(5, 9) + 's';
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 10000);
+}
+setInterval(makeFall, 450);
+
+// 点击爆炸
+const box = document.getElementById('box');
+const text = document.getElementById('text');
+
+box.addEventListener('click', () => {
+  text.classList.add('show');
+  setTimeout(() => text.classList.remove('show'), 500);
+
+  // 50 个，范围更大
+  for (let i = 0; i < 50; i++) {
+    let b = document.createElement('div');
+    b.className = 'burst';
+    b.style.fontSize = r(10, 18) + 'px';
+
+    let angle = r(0, Math.PI * 2);
+    let dist = r(80, 220); // 扩散距离更大
+    let x = Math.cos(angle) * dist + 'px';
+    let y = Math.sin(angle) * dist + 'px';
+
+    b.style.setProperty('--x', x);
+    b.style.setProperty('--y', y);
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 900);
+  }
+});
+</script>
+</body>
+</html>
